@@ -1,16 +1,15 @@
 from flask import Flask
 from flask import jsonify
+from flask import render_template
 import requests
 import json
 import pprint
 
-ticket = ""
-
 app = Flask(__name__)
 
 @app.route('/')
-def ticket_info():
-    return ticket
+def index():
+    return render_template("topology.html")
 
 @app.route('/api/topology')
 def get_topology():
@@ -18,14 +17,14 @@ def get_topology():
     header = {"content-type": "application/json", "X-Auth-Token": ticket}
     controller = "devnetapi.cisco.com/sandbox/apic_em"
     url = "https://" + controller + "/api/v1/topology/physical-topology"
-    response = requests.get(url, headers=header, verify=False)
-
-    return response
+    response = requests.get(url,headers = header,verify = False)
+    topology = jsonify(response.json()['response'])
+    return topology
 
 
 if __name__ == '__main__':
 
-    global ticket
+    ticket = ""
     header = {"content-type": "application/json"}
     payload = {"username": "devnetuser", "password": "Cisco123!"}
     url = "https://sandboxapic.cisco.com/api/v1/ticket"
